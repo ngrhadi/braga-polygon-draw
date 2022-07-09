@@ -1,0 +1,29 @@
+
+.mapboxgl-canvas,
+.map-container {
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  right: 0;
+  position: absolute;
+}
+
+.sidebar-custom::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.sidebar-custom::-webkit-scrollbar-track {
+  background: #252525;
+}
+
+/* Handle */
+.sidebar-custom::-webkit-scrollbar-thumb {
+  margin-right: -10px;
+  background: #2a2de4;
+}
+
+/* Handle on hover */
+.sidebar-custom::-webkit-scrollbar-thumb:hover {
+  background: #509de5;
+}
