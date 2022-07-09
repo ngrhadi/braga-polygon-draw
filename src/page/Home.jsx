@@ -1,11 +1,14 @@
 import "../App.css";
 import { useEffect, useRef, useState } from "react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax, import/no-unresolved, import/no-extraneous-dependencies
 import usePolygonData from "../hooks/usePolygonData";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import Sidebar from "../component/Sidebar";
 import MenuOpen from "../icon/MenuOpen";
+import { NavLink, Link } from "react-router-dom";
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax, import/no-unresolved, import/no-extraneous-dependencies
+import Legenda from "../component/Legenda";
+import LegendaIcon from "../icon/LegendaIcon";
 
 mapboxgl.accessToken =
 	"pk.eyJ1IjoibmdyaGFkaSIsImEiOiJjbDU4YmJpNHIxenl2M2N0NzNybnFnNGFvIn0.k1PNwfeFCEuFZlfngl7sWA";
@@ -41,6 +44,14 @@ function Home() {
 			setShowUndo(true);
 			setCloseShape(true);
 		}
+	};
+
+	const handleCloseDataPoly = () => {
+		setDataPoly(null);
+		setShowImport(false);
+		setShowReset(false);
+		setShowUndo(false);
+		setCloseShape(false);
 	};
 
 	const {
@@ -96,6 +107,10 @@ function Home() {
 		});
 	};
 
+	const hideLayer = () => {
+		map.current.removeLayer("polygon-test");
+	};
+
 	const handleAddLayerOnDraw = () => {
 		map.current.on("draw.create", (e) => {
 			const { features } = e;
@@ -111,7 +126,7 @@ function Home() {
 					id: `${Date.now()}`,
 				},
 			};
-			// console.log(newData);
+			console.log(newData);
 			setDataPoly(newData);
 			setShowImport(true);
 			setShowReset(true);
@@ -185,6 +200,16 @@ function Home() {
 		setShowSidebar(false);
 	};
 
+	const [showLegenda, setShowLegenda] = useState(false);
+
+	const handleLegenda = () => {
+		setShowLegenda(!showLegenda);
+	};
+
+	const handleCloseLegenda = () => {
+		setShowLegenda(false);
+	};
+
 	return (
 		<div className="App">
 			<div>
@@ -202,6 +227,7 @@ function Home() {
 						numberCoord={numberCoord}
 						lockValue={lockValue}
 						setLockValue={setLockValue}
+						handleCloseDataPoly={handleCloseDataPoly}
 						showImport={showImport}
 						showReset={showReset}
 						showUndo={showUndo}
@@ -209,20 +235,31 @@ function Home() {
 						handleButtonAddLayers={handleButtonAddLayers}
 						handleAddLayerOnDraw={handleAddLayerOnDraw}
 						polygonRef={polygonRef}
+						hideLayer={hideLayer}
+					/>
+				)}
+				{showLegenda && (
+					<Legenda
+						handleLegenda={handleLegenda}
+						handleCloseLegenda={handleCloseLegenda}
 					/>
 				)}
 			</div>
-			<div className="absolute grid grid-cols-3 place-items-center">
+			<div className="place-items-center">
 				<button
-					className="bg-zinc-800 text-white z-10 absolute top-0 m-2"
-					style={{
-						left: showSidebar ? "-100%" : "0",
-						width: "29px",
-						height: "29px",
-						borderRadius: "50%",
-					}}
-					onClick={handleSidebar}>
-					<MenuOpen />
+					className="bg-zinc-800 text-white z-10 absolute top-0 m-2 items-center justify-center rounded-full"
+					onClick={() => handleSidebar()}>
+					<Link to="/nav">
+						<MenuOpen />
+					</Link>
+				</button>
+				<button
+					className="bg-zinc-800 text-white z-10 absolute bottom-10 h-32 right-0 items-center justify-center rounded-l-lg"
+					onClick={() => handleLegenda()}>
+					<Link to="/legend">
+						<LegendaIcon />
+						<p className="text-vertical">Legenda</p>
+					</Link>
 				</button>
 			</div>
 			<div ref={mapContainer} className="map-container" />
