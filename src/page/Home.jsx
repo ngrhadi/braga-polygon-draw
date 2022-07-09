@@ -1,7 +1,7 @@
 import "../App.css";
 import { useEffect, useRef, useState } from "react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import mapboxgl from "mapbox-gl";
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax, import/no-unresolved, import/no-extraneous-dependencies
 import usePolygonData from "../hooks/usePolygonData";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import Sidebar from "../component/Sidebar";
