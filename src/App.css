@@ -20,10 +20,16 @@
 /* Handle */
 .sidebar-custom::-webkit-scrollbar-thumb {
   margin-right: -10px;
-  background: #2a2de4;
+  background: #4e50ff;
 }
 
 /* Handle on hover */
 .sidebar-custom::-webkit-scrollbar-thumb:hover {
   background: #509de5;
+}
+
+.text-vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: right;
 }
