@@ -13,6 +13,8 @@ import LegendaIcon from "../icon/LegendaIcon";
 mapboxgl.accessToken =
 	"pk.eyJ1IjoibmdyaGFkaSIsImEiOiJjbDU4YmJpNHIxenl2M2N0NzNybnFnNGFvIn0.k1PNwfeFCEuFZlfngl7sWA";
 
+const idxValue = 0;
+
 function Home() {
 	const mapContainer = useRef(null);
 	const map = useRef(null);
@@ -65,7 +67,7 @@ function Home() {
 		return {
 			type: "Feature",
 			geometry: dataPolygon[key].geometry,
-			id: dataPolygon[key].properties.id,
+			// id: dataPolygon[key].properties.id,
 		};
 	});
 
@@ -111,27 +113,29 @@ function Home() {
 		map.current.removeLayer("polygon-test");
 	};
 
+	const [newData, setNewData] = useState(null);
+
 	const handleAddLayerOnDraw = () => {
 		map.current.on("draw.create", (e) => {
 			const { features } = e;
 			const { geometry } = features[0];
 			const { coordinates } = geometry;
-			const newData = {
+			setNewData({
 				type: "Feature",
 				geometry: {
 					type: "Polygon",
 					coordinates: [coordinates],
 				},
 				properties: {
-					id: `${Date.now()}`,
+					id: idxValue + 1,
 				},
-			};
-			console.log(newData);
+			});
 			setDataPoly(newData);
 			setShowImport(true);
 			setShowReset(true);
 			setShowUndo(true);
 			setCloseShape(true);
+			return newData;
 		});
 	};
 
@@ -152,6 +156,7 @@ function Home() {
 		defaultMode: "draw_polygon",
 		touchEnabled: false,
 	});
+
 	useEffect(() => {
 		if (map.current) return; // initialize map only once
 		map.current = new mapboxgl.Map({
@@ -180,7 +185,6 @@ function Home() {
 			handleDataPoly(e.features);
 		});
 		map.current.on("click", (e) => {
-			setNumberCoord(numberCoord + 1);
 			let coordinat = e.lngLat.toArray();
 			let idCoordinat = `${numberCoord}+${coordinat[0].toFixed(
 				4,
@@ -215,6 +219,7 @@ function Home() {
 			<div>
 				{showSidebar && (
 					<Sidebar
+						newData={newData}
 						handleSidebar={handleSidebar}
 						handleCloseSidebar={handleCloseSidebar}
 						handleDragOption={handleDragOption}
@@ -247,14 +252,14 @@ function Home() {
 			</div>
 			<div className="place-items-center">
 				<button
-					className="bg-zinc-800 text-white z-10 absolute top-0 m-2 items-center justify-center rounded-full"
+					className="bg-zinc-800 hover:bg-yellow-500 text-white z-10 absolute top-0 m-2 items-center justify-center rounded-full"
 					onClick={() => handleSidebar()}>
 					<Link to="/nav">
 						<MenuOpen />
 					</Link>
 				</button>
 				<button
-					className="bg-zinc-800 text-white z-10 absolute bottom-10 h-32 right-0 items-center justify-center rounded-l-lg"
+					className="bg-zinc-800 hover:bg-yellow-500 text-white z-10 absolute bottom-10 h-32 right-0 items-center justify-center rounded-l-lg"
 					onClick={() => handleLegenda()}>
 					<Link to="/legend">
 						<LegendaIcon />
