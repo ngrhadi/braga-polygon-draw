@@ -33,3 +33,7 @@
   transform: rotate(180deg);
   text-align: right;
 }
+
+.mapboxgl-ctrl-top-right {
+  padding-top: 40px;
+}

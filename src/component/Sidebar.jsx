@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 export default function Sidebar(props) {
 	return (
 		<div
-			className="box-content w-4/12 h-full fixed z-20  bg-zinc-800"
+			className="box-content w-4/12 h-full fixed z-30  bg-zinc-800"
 			onChange={props.handleSidebar}>
 			<div className="bg-inherit box-content bg-zinc-800 z-30">
 				<button
@@ -58,12 +58,11 @@ export default function Sidebar(props) {
 						{props.showImport && (
 							<button
 								className="bg-zinc-800 mx-2 text-white rounded-full lg:w-2/12 border-2 border-white h-12 hover:bg-blue-500 hover:text-zinc-800 hover:font-bold hover:border-none"
-								onClick={props.handleButtonAddLayers}
-								onChange={props.hideLayer}>
+								onClick={props.handleButtonAddLayers}>
 								<p className="font-bold">Start</p>
 							</button>
 						)}
-						{props.showReset && (
+						{props.handleDrawPoly && (
 							<button
 								className="bg-zinc-800 mx-2 text-white rounded-full lg:w-2/12 border-2 border-white h-12 hover:bg-blue-500 hover:text-zinc-800 hover:font-bold hover:border-none"
 								onClick={props.handleAddLayerOnDraw}>
@@ -73,14 +72,14 @@ export default function Sidebar(props) {
 						{props.showUndo && (
 							<button
 								className="bg-zinc-800 mx-2 text-white rounded-full lg:w-2/12 border-2 border-white h-12 hover:bg-blue-500 hover:text-zinc-800 hover:font-bold hover:border-none"
-								onClick={props.handleDrawPoly}>
-								<p className="font-bold">Draw</p>
+								onClick={props.handleUndo}>
+								<p className="font-bold">Undo</p>
 							</button>
 						)}
 						{props.closeShape && (
 							<button
 								className="bg-zinc-800 mx-2 text-white rounded-full lg:w-2/12 border-2 border-white h-12 hover:bg-yellow-300 hover:text-zinc-800 hover:font-bold hover:border-none"
-								onClick={props.handleCloseDataPoly}>
+								onClick={props.handleCloseShape}>
 								<p className="font-bold">Save</p>
 							</button>
 						)}
@@ -101,10 +100,10 @@ export default function Sidebar(props) {
 								<br />
 								<li className="lg:justify-center align-bottom items-center flex flex-col sm:flex-row">
 									<span className="text-gray-400 sm:mx-2 mx-0">
-										{props.newData.geometry.coordinates.map((element) => {
+										{props.newData.geometry.coordinates.map((element, idx) => {
 											return (
 												<div className="table-auto">
-													<div className="table-row">
+													<div key={idx} className="table-row">
 														<div className="table-cell">
 															<p>
 																Coordinat : <br />
@@ -120,20 +119,7 @@ export default function Sidebar(props) {
 													</div>
 												</div>
 											);
-
-											// const lat = item[1];
-											// const lng = item[0];
-											// return (
-											// 	<div key={id}>
-											// 		<p className="text-gray-400">
-											// 			{id}. {lat} , {lng}
-											// 		</p>
-											// 	</div>
-											// );
 										})}
-										{/* .replace(/\[|\]/, "")
-											.replace(/\ /g, "")
-											.replace(/\ /g, "")} */}
 									</span>
 								</li>
 							</ul>

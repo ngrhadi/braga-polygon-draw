@@ -5,7 +5,7 @@ import usePolygonData from "../hooks/usePolygonData";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import Sidebar from "../component/Sidebar";
 import MenuOpen from "../icon/MenuOpen";
-import { NavLink, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax, import/no-unresolved, import/no-extraneous-dependencies
 import Legenda from "../component/Legenda";
 import LegendaIcon from "../icon/LegendaIcon";
@@ -56,20 +56,32 @@ function Home() {
 		setCloseShape(false);
 	};
 
-	const {
-		data: dataPolygon,
-		loading: loadingPolygon,
-		error: errorPolygon,
-		url: urlPolygon,
-	} = usePolygonData();
+	// const {
+	// 	data: dataPolygon,
+	// 	loading: loadingPolygon,
+	// 	error: errorPolygon,
+	// } = usePolygonData();
 
-	const objectMapping = Object.keys(dataPolygon ?? {}).map((key) => {
-		return {
+	const objectMapping = (data) => {
+		const object = {
 			type: "Feature",
-			geometry: dataPolygon[key].geometry,
-			// id: dataPolygon[key].properties.id,
+			properties: {},
+			geometry: {
+				type: "Polygon",
+				coordinates: [data],
+			},
 		};
-	});
+		return object;
+	};
+
+	const handleImport = () => {
+		const data = objectMapping(dataPoly);
+		setDataPoly(data);
+		setShowImport(false);
+		setShowReset(true);
+		setShowUndo(true);
+		setCloseShape(true);
+	};
 
 	const handleButtonAddLayers = () => {
 		map.current.addLayer({
@@ -101,7 +113,6 @@ function Home() {
 					},
 				},
 			},
-
 			paint: {
 				"fill-color": "#088",
 				"fill-opacity": 0.8,
@@ -116,7 +127,8 @@ function Home() {
 	const [newData, setNewData] = useState(null);
 
 	const handleAddLayerOnDraw = () => {
-		map.current.on("draw.create", (e) => {
+		const modes = MapboxDraw.modes;
+		const addNewData = map.current.on("draw.create", (e) => {
 			const { features } = e;
 			const { geometry } = features[0];
 			const { coordinates } = geometry;
@@ -131,12 +143,35 @@ function Home() {
 				},
 			});
 			setDataPoly(newData);
-			setShowImport(true);
-			setShowReset(true);
-			setShowUndo(true);
+			setShowImport(false);
+			setShowReset(false);
+			setShowUndo(false);
 			setCloseShape(true);
-			return newData;
+			return addNewData;
 		});
+		// console.log(modes); // not yet implemented
+		return addNewData;
+	};
+
+	const handleShow = () => {
+		map.current.addLayer("polygon-test");
+	};
+	const handleUndo = () => {
+		map.current.removeLayer("polygon-test");
+	};
+
+	const handleCloseShape = () => {
+		setDataPoly({
+			type: "Feature",
+			geometry: {
+				type: "Polygon",
+				coordinates: [],
+			},
+		});
+		setShowImport(false);
+		setShowReset(false);
+		setShowUndo(false);
+		setCloseShape(false);
 	};
 
 	const handleDragOption = () => {
@@ -158,7 +193,7 @@ function Home() {
 	});
 
 	useEffect(() => {
-		if (map.current) return; // initialize map only once
+		if (map.current) return;
 		map.current = new mapboxgl.Map({
 			container: mapContainer.current,
 			style: "mapbox://styles/mapbox/streets-v11",
@@ -175,7 +210,7 @@ function Home() {
 	}, []);
 
 	useEffect(() => {
-		if (!map.current) return; // wait for map to initialize
+		if (!map.current) return;
 		map.current.on("move", () => {
 			setLng(map.current.getCenter().lng.toFixed(4));
 			setLat(map.current.getCenter().lat.toFixed(4));
@@ -241,6 +276,10 @@ function Home() {
 						handleAddLayerOnDraw={handleAddLayerOnDraw}
 						polygonRef={polygonRef}
 						hideLayer={hideLayer}
+						handleImport={handleImport}
+						handleUndo={handleUndo}
+						handleCloseShape={handleCloseShape}
+						handleShow={handleShow}
 					/>
 				)}
 				{showLegenda && (
@@ -252,12 +291,14 @@ function Home() {
 			</div>
 			<div className="place-items-center">
 				<button
-					className="bg-zinc-800 hover:bg-yellow-500 text-white z-10 absolute top-0 m-2 items-center justify-center rounded-full"
+					className="absolute bg-zinc-800 hover:bg-yellow-500 text-white z-20 top-0 m-2 items-center justify-center rounded-full"
 					onClick={() => handleSidebar()}>
 					<Link to="/nav">
 						<MenuOpen />
 					</Link>
 				</button>
+			</div>
+			<div className="place-items-center">
 				<button
 					className="bg-zinc-800 hover:bg-yellow-500 text-white z-10 absolute bottom-10 h-32 right-0 items-center justify-center rounded-l-lg"
 					onClick={() => handleLegenda()}>
